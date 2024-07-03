@@ -1,1 +1,6 @@
-spring.application.name=springsecurity-v6
+spring:
+  security:
+    user:
+      name: asd
+      password: 123
+      roles: USER
