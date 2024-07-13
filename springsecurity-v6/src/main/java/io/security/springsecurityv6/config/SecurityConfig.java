@@ -23,8 +23,15 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 .authorizeHttpRequests(auth -> auth.anyRequest().authenticated()) //어떤 요청이든 인증하겠다는 의미
-//                .httpBasic(Customizer.withDefaults());
-                .httpBasic(basic -> basic.authenticationEntryPoint(new CustomAuthenticationEntryPoint()));
+                .formLogin(Customizer.withDefaults())
+                .rememberMe(rememberMe -> rememberMe
+                        .alwaysRemember(true) //default:false -> true로 사용하는건 위험하다 false로 사용자가 선택하게 해야한다.
+                        .tokenValiditySeconds(3600)
+                        .userDetailsService(userDetailsService())
+                        .rememberMeParameter("remember") //default:remember-me
+                        .rememberMeCookieName("remember") //default:remember-me
+                        .key("security")
+                );
 
         return http.build();
     }
