@@ -32,4 +32,9 @@ public class IndexController {
         return "login";
     }
 
+    @GetMapping("/logoutSuccess")
+    public String logoutSuccess() {
+        return "logoutSuccess";
+    }
+
 }

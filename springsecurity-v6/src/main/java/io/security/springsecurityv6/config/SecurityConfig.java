@@ -3,6 +3,7 @@ package io.security.springsecurityv6.config;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.Customizer;
@@ -10,6 +11,7 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -17,6 +19,9 @@ import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
+import org.springframework.security.web.authentication.logout.LogoutHandler;
+import org.springframework.security.web.authentication.logout.LogoutSuccessHandler;
+import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
 import java.io.IOException;
 
@@ -27,31 +32,38 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-                .authorizeHttpRequests(auth -> auth.anyRequest().authenticated()) //어떤 요청이든 인증하겠다는 의미
-//              .formLogin(Customizer.withDefaults()); //기본적으로 주어지는 폼로그인을 사용하겠다는 의미
-                .formLogin(form -> form
-//                        .loginPage("/loginPage")
-                        .loginProcessingUrl("/loginProc")
-                        .defaultSuccessUrl("/", false) //true=인증에 성공하면 무조건 이곳으로 이동한다. false=인증이 필요한 곳을 방문 하였으면 인증을 완료 후 방문하려는 위치로 리다이렉트된다.
-                        .failureUrl("/failed")
-                        .usernameParameter("userId")
-                        .passwordParameter("passwd")
-                        .successHandler(new AuthenticationSuccessHandler() { //failureUrl을 무시하고 해당 핸들러를 우선시한다.
+                .authorizeHttpRequests(auth -> auth
+                        .requestMatchers("/logoutSuccess").permitAll() //logoutSuccess에 모두 접근가능하도록 허용한다는 의미
+                        .anyRequest().authenticated()) //어떤 요청이든 인증하겠다는 의미
+                .formLogin(Customizer.withDefaults()) //기본적으로 주어지는 폼로그인을 사용하겠다는 의미
+
+//                .csrf(csrf -> csrf.disable())
+                .logout(logout -> logout
+                        .logoutUrl("/logoutProc")
+                        .logoutRequestMatcher(new AntPathRequestMatcher("/logoutProc", "GET")) //logoutUrl과 RequestMatcher가 동시에 있으면 RequestMatcher이 더 우선시 된다
+
+                        .logoutSuccessUrl("/logoutSuccess")
+                        .logoutSuccessHandler(new LogoutSuccessHandler() {
                             @Override
-                            public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException, ServletException {
-                                System.out.println("authentication success : " + authentication);
-                                response.sendRedirect("/home");
+                            public void onLogoutSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException, ServletException {
+                                response.sendRedirect("/logoutSuccess");
                             }
                         })
-                        .failureHandler(new AuthenticationFailureHandler() { //defaultSuccessUrl을 무시하고 해당 핸들러를 우선시한다.
+                        .deleteCookies("JSESSIONID", "remember-me")
+                        .invalidateHttpSession(true) //logout시 세션 무효화
+                        .clearAuthentication(true) //security context안에 있는 authentication을 제거한다.
+                        .addLogoutHandler(new LogoutHandler() {
                             @Override
-                            public void onAuthenticationFailure(HttpServletRequest request, HttpServletResponse response, AuthenticationException exception) throws IOException, ServletException {
-                                System.out.println("exception: " + exception.getMessage());
-                                response.sendRedirect("/login");
+                            public void logout(HttpServletRequest request, HttpServletResponse response, Authentication authentication) {
+                                HttpSession session = request.getSession();
+                                session.invalidate();
+                                SecurityContextHolder.getContextHolderStrategy().getContext().setAuthentication(null);
+                                SecurityContextHolder.getContextHolderStrategy().clearContext();
                             }
                         })
                         .permitAll()
                 );
+
 
         return http.build();
     }
