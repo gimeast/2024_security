@@ -1,5 +1,6 @@
 package io.security.springsecurityv6;
 
+import io.micrometer.common.util.StringUtils;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -8,8 +9,12 @@ import org.springframework.web.bind.annotation.RestController;
 public class IndexController {
 
     @GetMapping("/")
-    public String index() {
-        return "index";
+    public String index(String customParam) {
+        if(StringUtils.isNotEmpty(customParam)) {
+            return "custom";
+        } else {
+            return "index";
+        }
     }
 
     @PostMapping("/loginProc")
