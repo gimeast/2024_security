@@ -1,4 +1,4 @@
-package io.security.springsecurityv6.config;
+package io.security.springsecurityv6;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletRequest;
