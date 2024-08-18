@@ -20,9 +20,16 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/login").permitAll()
+                        .requestMatchers("/invalidSessionUrl", "/expiredUrl").permitAll()
                         .anyRequest().authenticated())
                 .formLogin(Customizer.withDefaults())
+                .sessionManagement(session -> session
+                                .invalidSessionUrl("/invalidSessionUrl")
+                                .maximumSessions(1)
+                                .maxSessionsPreventsLogin(false) //default = false`, false는 새로운 세션이 생성되면 처음 만들어진 세션을 만료 시킨다.
+//                                .maxSessionsPreventsLogin(true) //true는 새로운 세션을 생성하려 하면 차단된다.
+                                .expiredUrl("/expiredUrl")
+                )
         ;
 
         return http.build();
