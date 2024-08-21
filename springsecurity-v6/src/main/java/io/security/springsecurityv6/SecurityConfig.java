@@ -5,7 +5,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.annotation.web.configurers.SessionManagementConfigurer;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -25,10 +25,10 @@ public class SecurityConfig {
                         .anyRequest().authenticated())
                 .formLogin(Customizer.withDefaults())
                 .sessionManagement(session -> session
-//                        .sessionFixation(SessionManagementConfigurer.SessionFixationConfigurer::none)
-                        .sessionFixation(SessionManagementConfigurer.SessionFixationConfigurer::changeSessionId) //default
-//                        .sessionFixation(SessionManagementConfigurer.SessionFixationConfigurer::newSession)
-//                        .sessionFixation(SessionManagementConfigurer.SessionFixationConfigurer::migrateSession)
+//                                .sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)
+                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+//                        .sessionCreationPolicy(SessionCreationPolicy.ALWAYS)
+//                        .sessionCreationPolicy(SessionCreationPolicy.NEVER)
                 )
         ;
 
