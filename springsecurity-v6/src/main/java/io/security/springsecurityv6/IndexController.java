@@ -31,5 +31,9 @@ public class IndexController {
     public String login() {
         return "login";
     }
+    @GetMapping("/denied")
+    public String denied() {
+        return "denied";
+    }
 
 }
