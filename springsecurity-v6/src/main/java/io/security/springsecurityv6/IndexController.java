@@ -32,4 +32,9 @@ public class IndexController {
         return "login";
     }
 
+    @PostMapping("/csrf")
+    public String csrf() {
+        return "csrf 적용";
+    }
+
 }
