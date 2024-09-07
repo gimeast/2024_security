@@ -10,6 +10,8 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
+import org.springframework.security.web.csrf.XorCsrfTokenRequestAttributeHandler;
 
 
 @EnableWebSecurity
@@ -18,11 +20,20 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+        //기본은 세션저장
+        
+        //쿠키저장방식
+//        CookieCsrfTokenRepository csrfTokenRepository = new CookieCsrfTokenRepository();
+//        XorCsrfTokenRequestAttributeHandler csrfTokenRepository = new XorCsrfTokenRequestAttributeHandler();
+//        csrfTokenRepository.setCsrfRequestAttributeName(null); //지연방식으로 사용하지않으려면 null을 주면 된다.
+
         http
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/csrf").permitAll()
+                        .requestMatchers("/csrf", "/csrf-token").permitAll()
                         .anyRequest().authenticated())
                 .formLogin(Customizer.withDefaults())
+//                .csrf(csrf -> csrf.csrfTokenRepository(csrfTokenRepository))
+//                .csrf(csrf -> csrf.csrfTokenRequestHandler(csrfTokenRepository)) //XorCsrfTokenRequestAttributeHandler는 default로 구현안해도 되지만 커스텀 하려면 알고있어야 한다.
         ;
 
         return http.build();
