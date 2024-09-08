@@ -21,45 +21,15 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        SpaCsrfTokenRequestHandler csrfTokenRequestHandler = new SpaCsrfTokenRequestHandler();
 
         http
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/csrf", "/csrf-token", "/formCsrf", "/form", "/cookie", "/cookieCsrf").permitAll()
                         .anyRequest().authenticated())
                 .formLogin(Customizer.withDefaults())
-                .csrf(csrf -> csrf
-                        .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
-                        .csrfTokenRequestHandler(csrfTokenRequestHandler)
-                )
-                .addFilterBefore(new CsrfCookieFilter(), BasicAuthenticationFilter.class)
         ;
 
         return http.build();
     }
-/*
-    @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        //기본은 세션저장
-        
-        //쿠키저장방식
-        CookieCsrfTokenRepository csrfTokenRepository = new CookieCsrfTokenRepository();
-        XorCsrfTokenRequestAttributeHandler csrfTokenRequestAttributeHandler = new XorCsrfTokenRequestAttributeHandler();
-        csrfTokenRequestAttributeHandler.setCsrfRequestAttributeName(null); //지연방식으로 사용하지않으려면 null을 주면 된다.
-
-        http
-                .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/csrf", "/csrf-token", "/formCsrf", "/form").permitAll()
-                        .anyRequest().authenticated())
-                .formLogin(Customizer.withDefaults())
-//                .csrf(csrf -> csrf.csrfTokenRepository(csrfTokenRepository))
-//                .csrf(csrf -> csrf.csrfTokenRequestHandler(csrfTokenRequestAttributeHandler)) //XorCsrfTokenRequestAttributeHandler는 default로 구현 안해도 되지만 커스텀 하려면 알고있어야 한다.
-                .csrf(Customizer.withDefaults())
-        ;
-
-        return http.build();
-    }
-*/
 
     @Bean
     public UserDetailsService userDetailsService() {
