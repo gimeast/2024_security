@@ -10,6 +10,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 import org.springframework.security.web.csrf.XorCsrfTokenRequestAttributeHandler;
 
@@ -20,24 +21,45 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        //기본은 세션저장
-        
-        //쿠키저장방식
-//        CookieCsrfTokenRepository csrfTokenRepository = new CookieCsrfTokenRepository();
-//        XorCsrfTokenRequestAttributeHandler csrfTokenRepository = new XorCsrfTokenRequestAttributeHandler();
-//        csrfTokenRepository.setCsrfRequestAttributeName(null); //지연방식으로 사용하지않으려면 null을 주면 된다.
+        SpaCsrfTokenRequestHandler csrfTokenRequestHandler = new SpaCsrfTokenRequestHandler();
 
         http
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/csrf", "/csrf-token").permitAll()
+                        .requestMatchers("/csrf", "/csrf-token", "/formCsrf", "/form", "/cookie", "/cookieCsrf").permitAll()
                         .anyRequest().authenticated())
                 .formLogin(Customizer.withDefaults())
-//                .csrf(csrf -> csrf.csrfTokenRepository(csrfTokenRepository))
-//                .csrf(csrf -> csrf.csrfTokenRequestHandler(csrfTokenRepository)) //XorCsrfTokenRequestAttributeHandler는 default로 구현안해도 되지만 커스텀 하려면 알고있어야 한다.
+                .csrf(csrf -> csrf
+                        .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
+                        .csrfTokenRequestHandler(csrfTokenRequestHandler)
+                )
+                .addFilterBefore(new CsrfCookieFilter(), BasicAuthenticationFilter.class)
         ;
 
         return http.build();
     }
+/*
+    @Bean
+    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+        //기본은 세션저장
+        
+        //쿠키저장방식
+        CookieCsrfTokenRepository csrfTokenRepository = new CookieCsrfTokenRepository();
+        XorCsrfTokenRequestAttributeHandler csrfTokenRequestAttributeHandler = new XorCsrfTokenRequestAttributeHandler();
+        csrfTokenRequestAttributeHandler.setCsrfRequestAttributeName(null); //지연방식으로 사용하지않으려면 null을 주면 된다.
+
+        http
+                .authorizeHttpRequests(auth -> auth
+                        .requestMatchers("/csrf", "/csrf-token", "/formCsrf", "/form").permitAll()
+                        .anyRequest().authenticated())
+                .formLogin(Customizer.withDefaults())
+//                .csrf(csrf -> csrf.csrfTokenRepository(csrfTokenRepository))
+//                .csrf(csrf -> csrf.csrfTokenRequestHandler(csrfTokenRequestAttributeHandler)) //XorCsrfTokenRequestAttributeHandler는 default로 구현 안해도 되지만 커스텀 하려면 알고있어야 한다.
+                .csrf(Customizer.withDefaults())
+        ;
+
+        return http.build();
+    }
+*/
 
     @Bean
     public UserDetailsService userDetailsService() {
