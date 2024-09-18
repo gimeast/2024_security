@@ -1,7 +1,7 @@
 package io.security.springsecurityv6;
 
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -12,24 +12,28 @@ public class IndexController {
         return "index";
     }
 
-    @PostMapping("/loginProc")
-    public String loginProc() {
-        return "loginProc";
+    @GetMapping("/user")
+    public String user() {
+        return "user";
     }
 
-    @GetMapping("/failed")
-    public String failed() {
-        return "failed";
+    @GetMapping("/custom")
+    public String custom() {
+        return "custom";
     }
 
-    @GetMapping("/home")
-    public String home() {
-        return "home";
+    @GetMapping("/user/{name}")
+    public String userName(@PathVariable String name) {
+        return name;
     }
 
-    @GetMapping("/login")
-    public String login() {
-        return "login";
+    @GetMapping("/admin/db")
+    public String admin() {
+        return "admin";
     }
+
+
+
+
 
 }
