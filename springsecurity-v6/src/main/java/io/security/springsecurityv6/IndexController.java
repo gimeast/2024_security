@@ -12,24 +12,26 @@ public class IndexController {
         return "index";
     }
 
-    @PostMapping("/loginProc")
-    public String loginProc() {
-        return "loginProc";
+    @GetMapping("/custom")
+    public String custom() {
+        return "custom";
     }
 
-    @GetMapping("/failed")
-    public String failed() {
-        return "failed";
+    @GetMapping("/admin/db")
+    public String admin() {
+        return "admin";
     }
 
-    @GetMapping("/home")
-    public String home() {
-        return "home";
+    @GetMapping("/api/photos")
+    public String photos() {
+        return "photos";
     }
 
-    @GetMapping("/login")
-    public String login() {
-        return "login";
+    @GetMapping("/oauth/login")
+    public String oauth() {
+        return "oauthLogin";
     }
+
+
 
 }
