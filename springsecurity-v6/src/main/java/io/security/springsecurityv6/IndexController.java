@@ -11,25 +11,16 @@ public class IndexController {
     public String index() {
         return "index";
     }
-
-    @PostMapping("/loginProc")
-    public String loginProc() {
-        return "loginProc";
+    @GetMapping("/user")
+    public String user() {
+        return "user";
     }
-
-    @GetMapping("/failed")
-    public String failed() {
-        return "failed";
+    @GetMapping("/db")
+    public String db() {
+        return "db";
     }
-
-    @GetMapping("/home")
-    public String home() {
-        return "home";
+    @GetMapping("/admin")
+    public String admin() {
+        return "admin";
     }
-
-    @GetMapping("/login")
-    public String login() {
-        return "login";
-    }
-
 }
